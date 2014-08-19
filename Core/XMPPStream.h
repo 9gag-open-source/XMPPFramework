@@ -496,6 +496,16 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
 - (BOOL)authenticate:(id <XMPPSASLAuthentication>)auth error:(NSError **)errPtr;
 
 /**
+ * This method applies to Ninegag Chat authentication schemes only.
+ * This is ONLY authentication method.
+ *
+ * @see authenticate:error:
+ *
+ * This method exists for backwards compatibility, and may disappear in future versions.
+ **/
+- (BOOL)authenticateWithAuthType:(NSString *)inType authId:(NSString *)inAuthId authSecret:(NSString *)inAuthSecret error:(NSError **)errPtr;
+
+/**
  * This method applies to standard password authentication schemes only.
  * This is NOT the primary authentication method.
  * 

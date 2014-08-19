@@ -1895,6 +1895,79 @@ enum XMPPStreamConfig
 	return result;
 }
 
+- (BOOL)authenticateWithAuthType:(NSString *)inType authId:(NSString *)inAuthId authSecret:(NSString *)inAuthSecret error:(NSError **)errPtr
+{
+    XMPPLogTrace();
+    
+    NSLog(@"authenticateWithAuthType");
+    
+    NSString *authType = [inType copy];
+    NSString *authId = [inAuthId copy];
+    NSString *authSecret = [inAuthSecret copy];
+    
+    __block BOOL result = YES;
+	__block NSError *err = nil;
+	
+	dispatch_block_t block = ^{ @autoreleasepool {
+		
+		if (state != STATE_XMPP_CONNECTED)
+		{
+			NSString *errMsg = @"Please wait until the stream is connected.";
+			NSDictionary *info = [NSDictionary dictionaryWithObject:errMsg forKey:NSLocalizedDescriptionKey];
+			
+			err = [NSError errorWithDomain:XMPPStreamErrorDomain code:XMPPStreamInvalidState userInfo:info];
+			
+			result = NO;
+			return_from_block;
+		}
+		
+		if (myJID_setByClient == nil)
+		{
+			NSString *errMsg = @"You must set myJID before calling authenticate:error:.";
+			NSDictionary *info = [NSDictionary dictionaryWithObject:errMsg forKey:NSLocalizedDescriptionKey];
+			
+			err = [NSError errorWithDomain:XMPPStreamErrorDomain code:XMPPStreamInvalidProperty userInfo:info];
+			
+			result = NO;
+			return_from_block;
+		}
+		
+		// Choose the best authentication method.
+		//
+		// P.S. - This method is deprecated.
+		
+		id <XMPPSASLAuthentication> someAuth = nil;
+        
+        if ([self supportsNGCAuthentication])
+        {
+            someAuth = [[NGCAuthentication alloc] initWithStream:self type:authType authId:authId secret:authSecret];
+            result = [self authenticate:someAuth error:&err];
+        }
+		else
+		{
+			NSString *errMsg = @"No suitable authentication method found";
+			NSDictionary *info = [NSDictionary dictionaryWithObject:errMsg forKey:NSLocalizedDescriptionKey];
+			
+			err = [NSError errorWithDomain:XMPPStreamErrorDomain code:XMPPStreamUnsupportedAction userInfo:info];
+            
+            NSLog(@"No suitable authentication method found");
+			
+			result = NO;
+		}
+	}};
+	
+	
+	if (dispatch_get_specific(xmppQueueTag))
+		block();
+	else
+		dispatch_sync(xmppQueue, block);
+	
+	if (errPtr)
+		*errPtr = err;
+	
+	return result;
+}
+
 /**
  * This method applies to standard password authentication schemes only.
  * This is NOT the primary authentication method.
@@ -3198,16 +3271,16 @@ enum XMPPStreamConfig
     }
     else
     {
-		if (myJID_setByClient)
-		{
-			temp = @"<stream:stream xmlns='%@' xmlns:stream='%@' version='1.0' to='%@'>";
-            s2 = [NSString stringWithFormat:temp, xmlns, xmlns_stream, [myJID_setByClient domain]];
-		}
-        else if ([hostName length] > 0)
+		if ([hostName length] > 0)
         {
             temp = @"<stream:stream xmlns='%@' xmlns:stream='%@' version='1.0' to='%@'>";
             s2 = [NSString stringWithFormat:temp, xmlns, xmlns_stream, hostName];
         }
+        else if (myJID_setByClient)
+		{
+			temp = @"<stream:stream xmlns='%@' xmlns:stream='%@' version='1.0' to='%@'>";
+            s2 = [NSString stringWithFormat:temp, xmlns, xmlns_stream, [myJID_setByClient domain]];
+		}
         else
         {
             temp = @"<stream:stream xmlns='%@' xmlns:stream='%@' version='1.0'>";
