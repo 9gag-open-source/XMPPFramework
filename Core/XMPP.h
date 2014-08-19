@@ -12,7 +12,9 @@
 
 // 
 // Authentication
-// 
+//
+
+#import "NGCAuthentication.h"
 
 #import "XMPPSASLAuthentication.h"
 #import "XMPPDigestMD5Authentication.h"
