@@ -14,7 +14,7 @@
 // Authentication
 //
 
-#import "NGCAuthentication.h"
+#import "NGCChatSystemAuthentication.h"
 
 #import "XMPPSASLAuthentication.h"
 #import "XMPPCustomBinding.h"

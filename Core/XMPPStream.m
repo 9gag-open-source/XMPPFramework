@@ -1939,7 +1939,7 @@ enum XMPPStreamConfig
         
         if ([self supportsNGCAuthentication])
         {
-            someAuth = [[NGCAuthentication alloc] initWithStream:self type:authType authId:authId secret:authSecret];
+            someAuth = [[NGCChatSystemAuthentication alloc] initWithStream:self type:authType authId:authId secret:authSecret];
             result = [self authenticate:someAuth error:&err];
         }
 		else
