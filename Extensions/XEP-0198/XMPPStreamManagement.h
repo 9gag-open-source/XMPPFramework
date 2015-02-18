@@ -300,6 +300,12 @@
 - (void)xmppStreamManagement:(XMPPStreamManagement *)sender wasNotEnabled:(NSXMLElement *)failed;
 
 /**
+ * Notifies delegates of the server's response from sending the <resume> stanza.
+ **/
+- (void)xmppStreamManagement:(XMPPStreamManagement *)sender wasResumed:(NSXMLElement *)resumed;
+- (void)xmppStreamManagement:(XMPPStreamManagement *)sender wasNotResumed:(NSXMLElement *)failed;
+
+/**
  * Notifies delegates that a request <r/> for an ack from the server was sent.
 **/
 - (void)xmppStreamManagementDidRequestAck:(XMPPStreamManagement *)sender;

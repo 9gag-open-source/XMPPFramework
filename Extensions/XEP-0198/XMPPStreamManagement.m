@@ -735,6 +735,8 @@
 	{
 		[self processResumed:element];
 		
+        [multicastDelegate xmppStreamManagement:self wasResumed:element];
+        
 		return XMPP_BIND_SUCCESS;
 	}
 	else
@@ -751,6 +753,8 @@
 			prev_unackedByServer = nil;
 		}});
 		
+        [multicastDelegate xmppStreamManagement:self wasNotResumed:element];
+        
 		return XMPP_BIND_FAIL_FALLBACK;
 	}
 }
