@@ -3369,7 +3369,7 @@ enum XMPPStreamConfig
 		if ([hostName length] > 0)
         {
             temp = @"<stream:stream xmlns='%@' xmlns:stream='%@' version='1.0' to='%@'>";
-            s2 = [NSString stringWithFormat:temp, xmlns, xmlns_stream, @"chat.9jokes.com"];
+            s2 = [NSString stringWithFormat:temp, xmlns, xmlns_stream, NGC_XMPP_HOST];
         }
         else if (myJID_setByClient)
 		{
