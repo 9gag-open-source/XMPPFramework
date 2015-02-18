@@ -705,7 +705,11 @@
 	          lastDisconnect:&lastDisconnect
 	               forStream:xmppStream];
 	
-	if (![self canResumeStreamWithResumptionId:resumptionId timeout:timeout lastDisconnect:lastDisconnect])
+    BOOL canResume = [self canResumeStreamWithResumptionId:resumptionId timeout:timeout lastDisconnect:lastDisconnect];
+    
+    [multicastDelegate xmppStreamManagement:self willTryToStartResume:canResume];
+    
+	if (!canResume)
 	{
 		return XMPP_BIND_FAIL_FALLBACK;
 	}
