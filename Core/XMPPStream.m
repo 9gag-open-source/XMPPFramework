@@ -1131,9 +1131,25 @@ enum XMPPStreamConfig
 		else
 		{
 			// Open TCP connection to the configured hostName.
-			
 			state = STATE_XMPP_CONNECTING;
-			
+            
+            /*
+             * Quick workaround for IPv6 cannot connect to XMPP server
+             * Perform DNS Lookup on the remote host's IP Address
+             */
+            NSError *lookupHostErr = nil;
+            NSMutableArray *addresses = [GCDAsyncSocket lookupHost:hostName port:hostPort error:&lookupHostErr];
+            
+            if (!lookupHostErr && addresses) {
+                // Determine IP protocol addresses
+                for (NSData* address in addresses) {
+                    if([GCDAsyncSocket isIPv6Address:address]) {
+                        //prefer to use IPv6 if IPv6 DNS name found
+                        [asyncSocket setIPv4PreferredOverIPv6:NO];
+                    }
+                }
+            }
+            
 			NSError *connectErr = nil;
 			result = [self connectToHost:hostName onPort:hostPort withTimeout:XMPPStreamTimeoutNone error:&connectErr];
 			
